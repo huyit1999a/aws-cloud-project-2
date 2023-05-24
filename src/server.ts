@@ -21,16 +21,18 @@ import { filterImageFromURL, deleteLocalFiles } from "./util/util";
         let absolutePath: string = (await filterImageFromURL(
           req.query.image_url
         )) as string;
-        return res.status(200).sendFile(absolutePath, function (err) {
+        return res.status(200).sendFile(absolutePath, async function (err) {
           console.log("Download file successfully");
           // delete file
           if (!err) {
-            deleteLocalFiles([absolutePath]);
+            await deleteLocalFiles([absolutePath]);
             console.log("Delete file successfully");
+          } else {
+            res.status(422).send("file not found");
           }
         });
       } catch (e) {
-        return next(e);
+        return res.status(500).send(e);
       }
     }
   );
